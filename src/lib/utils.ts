@@ -1,3 +1,9 @@
+import { v4 as uuidv4 } from "uuid";
+
+export function generateId() {
+  return uuidv4();
+}
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()

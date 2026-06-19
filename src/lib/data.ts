@@ -1,5 +1,10 @@
 import { getSupabase } from "@/lib/supabase";
-import { serializeProduct, parseJsonArray, type ProductData } from "@/lib/utils";
+import {
+  serializeProduct,
+  parseJsonArray,
+  generateId,
+  type ProductData,
+} from "@/lib/utils";
 
 type DbProduct = {
   id: string;
@@ -166,9 +171,12 @@ export async function createProduct(input: {
   featured: boolean;
   active: boolean;
 }) {
+  const now = new Date().toISOString();
+
   const { data, error } = await getSupabase()
     .from("Product")
     .insert({
+      id: generateId(),
       title: input.title,
       slug: input.slug,
       description: input.description,
@@ -180,6 +188,8 @@ export async function createProduct(input: {
       categoryId: input.categoryId,
       featured: input.featured,
       active: input.active,
+      createdAt: now,
+      updatedAt: now,
     })
     .select("*")
     .single();
@@ -258,7 +268,11 @@ export async function createOrder(input: {
 }) {
   const { data, error } = await getSupabase()
     .from("Order")
-    .insert(input)
+    .insert({
+      id: generateId(),
+      ...input,
+      createdAt: new Date().toISOString(),
+    })
     .select("id")
     .single();
 
