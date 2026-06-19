@@ -1,0 +1,426 @@
+================================================================================
+                    USECANUTO - RESUMO COMPLETO DO PROJETO
+================================================================================
+
+Ultima atualizacao: 19 de junho de 2026, 18:51
+Pasta do projeto:    C:\Users\tozat\usecanuto
+Versao do codigo:    0.1.0 (Next.js 16.2.9)
+Ultimo commit:       feceaab — Admin: edicao completa do conteudo da pagina inicial
+
+================================================================================
+1. O QUE E O PROJETO
+================================================================================
+
+Nome:        UseCanuto
+Tipo:        E-commerce de moda feminina
+Inspiracao:  Maria Filo (mariafilo.com.br) — layout elegante, minimalista
+Objetivo:    Loja virtual para promocao e uso comercial real
+
+O UseCanuto e uma loja online completa com:
+  - Pagina inicial animada e profissional
+  - Catalogo de produtos por categoria (Vestidos, Blusas, Calcas, Saias, etc.)
+  - Carrinho de compras com drawer lateral
+  - Checkout com Cartao e PIX (modo demo ou Stripe real)
+  - Painel administrativo completo
+  - Conteudo da home 100% editavel pelo admin
+  - Upload de fotos de produtos na nuvem (Supabase Storage)
+  - Paginas de ajuda, contato, WhatsApp flutuante
+  - Deploy automatico no Netlify a cada git push
+
+================================================================================
+2. TECNOLOGIAS UTILIZADAS
+================================================================================
+
+Frontend:
+  - Next.js 16 (App Router)
+  - React 19
+  - TypeScript
+  - Tailwind CSS 4
+  - Framer Motion (animacoes)
+  - Lucide React (icones)
+
+Backend / API:
+  - Next.js API Routes (serverless no Netlify)
+  - Supabase JavaScript Client (@supabase/supabase-js)
+  - Supabase Storage (fotos de produtos + conteudo do site)
+  - JWT + bcryptjs (autenticacao admin)
+  - Stripe (pagamentos — opcional)
+
+Banco de dados:
+  - Supabase (PostgreSQL na nuvem)
+  - Tabelas: Admin, Category, Product, Order
+  - Storage bucket: product-images (fotos + config/site-content.json)
+
+Hospedagem:
+  - Netlify (producao) — https://usecanuto.netlify.app
+  - GitHub (codigo) — ScoobNoobDoo/usecanuto
+
+Fontes:
+  - Cormorant Garamond (titulos)
+  - Jost (corpo do texto)
+
+Legado (apenas desenvolvimento local, NAO usado em producao):
+  - Prisma + SQLite/PostgreSQL local (seed e schema de referencia)
+
+================================================================================
+3. LINKS E ACESSOS IMPORTANTES
+================================================================================
+
+SITE EM PRODUCAO:
+  Loja:              https://usecanuto.netlify.app
+  Admin login:       https://usecanuto.netlify.app/admin/login
+  Painel admin:      https://usecanuto.netlify.app/admin
+  Editar site:       https://usecanuto.netlify.app/admin/conteudo
+  Novo produto:      https://usecanuto.netlify.app/admin/novo-produto
+  Contato:           https://usecanuto.netlify.app/contato
+  Health API:        https://usecanuto.netlify.app/api/health
+  Conteudo API:      https://usecanuto.netlify.app/api/site-content
+
+LOGIN ADMIN:
+  E-mail: admin@usecanuto.com
+  Senha:  canuto2026
+
+GITHUB:
+  Repositorio: https://github.com/ScoobNoobDoo/usecanuto
+
+SUPABASE:
+  Painel:  https://supabase.com/dashboard/project/mtygxpaypbgkggtuthxq
+  API URL: https://mtygxpaypbgkggtuthxq.supabase.co
+
+NETLIFY:
+  Painel: https://app.netlify.com
+
+================================================================================
+4. VARIAVEIS DE AMBIENTE
+================================================================================
+
+Obrigatorias em producao (Netlify):
+
+  NEXT_PUBLIC_SUPABASE_URL         URL do projeto Supabase
+  SUPABASE_SERVICE_ROLE_KEY        Chave service_role (eyJ...)
+  NEXT_PUBLIC_SUPABASE_ANON_KEY    Chave anon publica (eyJ...)
+  JWT_SECRET                       Segredo para tokens do admin
+  ADMIN_PASSWORD                   Senha do admin (usada no seed)
+  NEXT_PUBLIC_URL                  https://usecanuto.netlify.app
+
+Opcionais (contato e redes):
+
+  NEXT_PUBLIC_INSTAGRAM_URL        https://instagram.com/seu_perfil
+  NEXT_PUBLIC_WHATSAPP_URL         https://wa.me/55SEUNUMERO
+  NEXT_PUBLIC_CONTACT_EMAIL        contato@usecanuto.com
+
+Opcionais (pagamento real):
+
+  STRIPE_SECRET_KEY
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  (Sem isso, checkout funciona em modo demonstracao)
+
+Nao usar mais em producao:
+  DATABASE_URL
+  DIRECT_URL
+  (Eram da fase Prisma — substituidos por Supabase JS)
+
+Modelo completo: .env.example
+
+================================================================================
+5. ESTRUTURA DE PASTAS PRINCIPAL
+================================================================================
+
+C:\Users\tozat\usecanuto\
+|
+|-- src/
+|   |-- app/
+|   |   |-- page.tsx                 Pagina inicial
+|   |   |-- loja/                    Catalogo com filtros
+|   |   |-- produto/[slug]/          Detalhe do produto
+|   |   |-- carrinho/                Carrinho
+|   |   |-- checkout/                Finalizar compra + sucesso
+|   |   |-- contato/                 Pagina de contato
+|   |   |-- ajuda/[slug]/            Trocas, entregas, pagamento, etc.
+|   |   |-- admin/
+|   |   |   |-- page.tsx             Dashboard de produtos
+|   |   |   |-- login/               Login admin
+|   |   |   |-- novo-produto/        Wizard criar anuncio (8 etapas)
+|   |   |   |-- produto/[id]/        Editar produto
+|   |   |   |-- conteudo/            Editar textos e imagens da home
+|   |   |-- api/
+|   |       |-- products/            CRUD produtos
+|   |       |-- categories/          Listar categorias
+|   |       |-- auth/                Login, logout, sessao
+|   |       |-- checkout/            Processar pedido
+|   |       |-- upload/              Upload de imagens
+|   |       |-- site-content/        GET/PUT conteudo editavel da home
+|   |       |-- health/              Diagnostico Supabase
+|   |
+|   |-- components/
+|   |   |-- layout/     Header, Footer, CartDrawer, WhatsAppButton
+|   |   |-- home/       Hero, WelcomeAnimation, CategoryGrid, PromoBar, etc.
+|   |   |-- product/    ProductCard, ProductModal
+|   |   |-- admin/      AdminWizard, SiteContentEditor, AdminImageThumb
+|   |
+|   |-- context/
+|   |   |-- CartContext.tsx          Carrinho (localStorage)
+|   |   |-- SiteContentContext.tsx   Conteudo editavel da home
+|   |
+|   |-- lib/
+|       |-- supabase.ts      Cliente Supabase
+|       |-- data.ts          Produtos, pedidos, categorias, conteudo do site
+|       |-- storage.ts       Upload Supabase Storage
+|       |-- site-content.ts  Tipos e valores padrao da home
+|       |-- site-config.ts   Instagram, WhatsApp, e-mail, pagamentos
+|       |-- categories.ts    Slugs oficiais das categorias
+|       |-- auth.ts          JWT admin
+|       |-- stripe.ts        Pagamentos
+|       |-- upload-client.ts Upload no browser (admin)
+|       |-- help-content.ts  Textos das paginas de ajuda
+|       |-- utils.ts         Precos, slugs, generateId()
+|
+|-- scripts/
+|   |-- fix-categories.ts    Corrige produtos sem categoria no Supabase
+|   |-- setup-storage.ts     Cria/atualiza bucket product-images
+|   |-- seed-site-content.ts Salva conteudo inicial da home no Storage
+|
+|-- prisma/                  Schema e seed (desenvolvimento local)
+|-- public/                  Arquivos estaticos
+|-- netlify.toml             Config deploy Netlify
+|-- supabase-setup.sql       RLS leitura publica (Product, Category)
+|-- supabase-storage.sql     Config bucket de imagens (backup manual)
+|-- supabase-fix-categories.sql  SQL corrigir categorias de produtos
+|-- VOCE-PRECISA-FAZER.txt   Tarefas que so o usuario pode fazer
+|-- RESUMO-DO-PROJETO.txt    Este arquivo
+
+================================================================================
+6. FUNCIONALIDADES DO ADMIN (PAINEL COMPLETO)
+================================================================================
+
+DASHBOARD (/admin):
+  - Listar todos os produtos
+  - Ver categoria, tamanhos, cores de cada produto
+  - Editar preco rapido inline
+  - Ativar/desativar produto
+  - Excluir produto
+  - Botoes: Editar Site | Novo Anuncio | Sair
+
+NOVO ANUNCIO — Wizard 8 etapas (/admin/novo-produto):
+  1. Iniciar cadastro
+  2. Titulo da peca
+  3. Categoria (Vestidos, Blusas, Calcas, Saias, Acessorios) — OBRIGATORIO
+  4. Tamanhos (PP, P, M, G, GG + personalizados)
+  5. Cores (Preto, Branco, Bege, Navy + personalizadas)
+  6. Imagens (upload galeria PC/celular → Supabase Storage)
+  7. Descricao
+  8. Preco, preco promocional, destaque na home
+
+EDITAR PRODUTO (/admin/produto/[id]):
+  - Categoria
+  - Fotos (adicionar/remover via upload)
+  - Preco e preco promocional
+  - Descricao
+
+EDITAR SITE (/admin/conteudo):
+  - Faixa superior rolante (frete, PIX, cupom, etc.)
+  - Nome da marca e animacao de entrada
+  - Banner principal (imagem, titulos, descricao, botoes)
+  - Barra de beneficios (4 icones: pagamento, frete, entrega, cupom)
+  - Secao categorias (titulos + imagem de cada categoria)
+  - Secao destaques (titulo e subtitulo)
+  - Newsletter (titulo, descricao, mensagem de sucesso)
+  - Salvar tudo com um clique
+
+================================================================================
+7. LOJA (LADO DO CLIENTE)
+================================================================================
+
+Pagina inicial:
+  - Animacao de boas-vindas (editavel)
+  - Banner hero com parallax (editavel)
+  - Barra de beneficios (editavel)
+  - Grid de categorias (editavel)
+  - Produtos em destaque (vem do banco, titulo editavel)
+  - Newsletter (editavel)
+  - Faixa superior rolante no header (editavel)
+
+Outras paginas:
+  - /loja — catalogo com filtro ?categoria= e ?sale=true
+  - /produto/[slug] — detalhe, tamanho, cor, compra rapida
+  - /carrinho — revisar itens
+  - /checkout — dados, cartao ou PIX, resumo
+  - /checkout/sucesso — confirmacao (modo demo ou Stripe)
+  - /contato — WhatsApp, e-mail, Instagram
+  - /ajuda/trocas, /ajuda/entregas, /ajuda/pagamento, /ajuda/sobre, etc.
+
+Extras:
+  - Botao flutuante WhatsApp (canto inferior direito)
+  - Carrinho drawer lateral
+  - Footer com links reais (loja, ajuda, institucional)
+  - Carrinho salvo no localStorage do navegador
+
+================================================================================
+8. CRONOLOGIA COMPLETA DO PROJETO
+================================================================================
+
+FASE 1 — CRIACAO DO SITE (inicio)
+  - Projeto Next.js criado em C:\Users\tozat\usecanuto
+  - Loja inspirada na Maria Filo com animacoes Framer Motion
+  - Header, carrinho, catalogo, modal de produto
+  - Admin com wizard, login JWT
+  - Stripe checkout (modo demo)
+  - Prisma + SQLite local, 6 produtos de exemplo
+
+FASE 2 — TENTATIVA VERCEL + NEON
+  - Guia preparado, usuario achou complexo
+  - Decisao: Netlify + Supabase
+
+FASE 3 — DEPLOY NETLIFY + PRISMA (falhou)
+  - Site publicado mas quebrava com "Server Components render error"
+  - Causa: Prisma instavel em serverless Netlify
+
+FASE 4 — MIGRACAO SUPABASE JS (sucesso)
+  - Removido Prisma do runtime de producao
+  - Criado supabase.ts + data.ts
+  - RLS aplicado (supabase-setup.sql)
+  - Site no ar: https://usecanuto.netlify.app
+
+FASE 5 — MELHORIAS COM GROK/CLAUDE (19/06/2026)
+
+  5.1 Categorias no admin
+      - Etapa "Categoria" no wizard (passo 3)
+      - Edicao de categoria ao editar produto
+      - Categoria exibida no dashboard
+      - Produtos filtram corretamente em /loja?categoria=vestidos
+      - Script fix-categories.ts corrigiu 2 produtos sem categoria
+
+  5.2 Contato, ajuda e pagamentos
+      - Pagina /contato com WhatsApp, e-mail, Instagram
+      - Paginas /ajuda/* (trocas, entregas, pagamento, sobre, etc.)
+      - Botao WhatsApp flutuante
+      - Footer com links reais
+      - site-config.ts para variaveis de contato
+
+  5.3 Upload de fotos (Supabase Storage)
+      - Bucket product-images criado automaticamente
+      - Upload funciona no PC e celular (abre galeria/arquivos)
+      - Preview imediato apos envio
+      - Suporte JPG, PNG, WebP, HEIC (iPhone)
+      - Limite 5MB por imagem
+
+  5.4 Correcao publicar produto
+      - Erro "null value in column id" corrigido
+      - Sistema gera id, createdAt e updatedAt automaticamente
+
+  5.5 Checkout melhorado
+      - Endereco salvo no pedido
+      - PIX funciona no modo demo com mensagem correta
+      - Erros exibidos na tela (sem alert)
+      - Stripe preparado para PIX real quando configurado
+
+  5.6 Edicao completa da pagina inicial (admin/conteudo)
+      - Todos os textos da home editaveis pelo admin
+      - Faixa superior rolante, hero, promos, categorias, newsletter
+      - Conteudo salvo em Supabase Storage (config/site-content.json)
+      - Botao "Editar Site" no painel admin
+
+================================================================================
+9. ERROS ENCONTRADOS E SOLUCOES
+================================================================================
+
+ERRO: Server Components render error (Prisma no Netlify)
+  Solucao: Migracao para Supabase JS Client
+
+ERRO: Codigo alterado mas site nao mudava
+  Solucao: Faltava git commit + git push (deploy automatico Netlify)
+
+ERRO: null value in column "id" ao publicar produto
+  Solucao: generateId() + createdAt/updatedAt no insert
+
+ERRO: Upload de fotos falhava em producao
+  Solucao: Supabase Storage (bucket product-images)
+
+ERRO: Categorias vazias no admin / produtos fora da secao certa
+  Solucao: Etapa categoria no wizard + fix-categories.ts
+
+ERRO: Chaves sb_secret / sb_publishable no Supabase
+  Solucao: Usar chaves eyJ... (anon + service_role)
+
+ERRO: mime type application/json not supported (conteudo do site)
+  Solucao: Bucket atualizado para aceitar JSON alem de imagens
+
+================================================================================
+10. ESTADO ATUAL (19/06/2026 — TUDO FUNCIONANDO)
+================================================================================
+
+[OK] Site online: https://usecanuto.netlify.app
+[OK] Supabase conectado — 6 produtos, 5 categorias
+[OK] Admin completo (produtos + editar site)
+[OK] Categorias no cadastro e edicao de produtos
+[OK] Upload de fotos na nuvem (PC e celular)
+[OK] Conteudo da home editavel pelo admin
+[OK] Carrinho e checkout (modo demo)
+[OK] Contato, WhatsApp, paginas de ajuda
+[OK] Deploy automatico via git push
+[OK] RLS e Storage configurados no Supabase
+
+Pendente (so o usuario pode fazer):
+  - Configurar links reais Instagram/WhatsApp no Netlify
+  - Configurar Stripe para pagamentos reais
+  - Rotacionar chaves Supabase (foram expostas no chat)
+  - Dominio proprio (usecanuto.com.br)
+  - Ver VOCE-PRECISA-FAZER.txt
+
+================================================================================
+11. COMANDOS UTEIS
+================================================================================
+
+cd C:\Users\tozat\usecanuto
+
+npm run dev              Rodar local (http://localhost:3000)
+npm run build            Build de producao
+npm run db:setup         Seed local Prisma (desenvolvimento)
+npm run db:fix-categories   Corrigir produtos sem categoria no Supabase
+npm run db:setup-storage      Criar/atualizar bucket de imagens
+npm run db:seed-site          Salvar conteudo inicial da home no Storage
+
+Deploy para o ar:
+  git add .
+  git commit -m "sua mensagem"
+  git push origin main
+  (Netlify faz deploy automatico em ~2 minutos)
+
+================================================================================
+12. ARQUIVOS DE DOCUMENTACAO
+================================================================================
+
+  RESUMO-DO-PROJETO.txt      Este arquivo (geral completo)
+  VOCE-PRECISA-FAZER.txt     O que so voce pode configurar
+  DEPLOY-NETLIFY.txt         Guia deploy
+  NETLIFY-COLE-AGORA.txt     Variaveis Netlify
+  .env.example               Modelo de variaveis
+  supabase-setup.sql         RLS leitura publica
+  supabase-storage.sql       Config bucket imagens
+  supabase-fix-categories.sql  Corrigir categorias de produtos
+
+================================================================================
+13. COMMITS RECENTES (HISTORICO GIT)
+================================================================================
+
+  feceaab  Admin: edicao completa do conteudo da pagina inicial
+  f0d2de7  Corrige publicacao de produto (id e datas)
+  c75387e  Upload fotos Supabase Storage, galeria mobile
+  f177b9a  Ajuda, contato, checkout PIX demo, categorias
+  90d2c3f  Selecao de categoria no admin
+  96c0ea2  Migracao Supabase JS (corrige Netlify)
+  dacf663  Site UseCanuto criado
+
+================================================================================
+14. RESUMO EM UMA FRASE
+================================================================================
+
+O UseCanuto e uma loja de moda feminina completa (Next.js + Supabase + Netlify)
+com admin para gerenciar produtos, fotos, categorias e todo o conteudo da
+pagina inicial — no ar em https://usecanuto.netlify.app, pronta para uso
+comercial com ajustes finais de redes sociais, Stripe e dominio proprio.
+
+================================================================================
+                         FIM DO RESUMO
+              Atualizado em 19/06/2026 as 18:51
+================================================================================
