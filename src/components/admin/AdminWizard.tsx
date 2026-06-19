@@ -10,8 +10,9 @@ import {
   Image as ImageIcon,
   Loader2,
 } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import AdminImageThumb from "@/components/admin/AdminImageThumb";
+import { uploadImageFiles, IMAGE_ACCEPT } from "@/lib/upload-client";
 
 const STEPS = [
   { id: 1, label: "Novo Anúncio", desc: "Iniciar cadastro" },
@@ -70,26 +71,23 @@ export default function AdminWizard() {
     const files = e.target.files;
     if (!files?.length) return;
 
+    const input = e.target;
     setUploading(true);
     setUploadError("");
-    const newImages = [...form.images];
-    for (const file of Array.from(files)) {
-      const fd = new FormData();
-      fd.append("file", file);
-      try {
-        const res = await fetch("/api/upload", { method: "POST", body: fd });
-        const data = await res.json();
-        if (data.url) {
-          newImages.push(data.url);
-        } else if (data.error) {
-          setUploadError(data.error);
-        }
-      } catch {
-        setUploadError("Falha no upload. Tente novamente.");
+
+    try {
+      const { urls, error } = await uploadImageFiles(files);
+      if (urls.length) {
+        setForm((prev) => ({ ...prev, images: [...prev.images, ...urls] }));
       }
+      if (error) setUploadError(error);
+      else if (!urls.length) setUploadError("Nenhuma imagem foi enviada.");
+    } catch {
+      setUploadError("Falha no upload. Tente novamente.");
+    } finally {
+      setUploading(false);
+      input.value = "";
     }
-    update("images", newImages);
-    setUploading(false);
   };
 
   const canProceed = () => {
@@ -331,7 +329,7 @@ export default function AdminWizard() {
               <label className="flex flex-col items-center justify-center border-2 border-dashed border-border p-10 cursor-pointer hover:border-accent transition-colors duration-300 group">
                 <input
                   type="file"
-                  accept="image/*"
+                  accept={IMAGE_ACCEPT}
                   multiple
                   onChange={handleUpload}
                   className="hidden"
@@ -349,7 +347,7 @@ export default function AdminWizard() {
                       Clique para adicionar imagens
                     </span>
                     <span className="text-xs text-muted/60 mt-1">
-                      JPG, PNG ou WebP
+                      Galeria ou arquivos — JPG, PNG, WebP (máx. 5MB)
                     </span>
                   </>
                 )}
@@ -363,7 +361,7 @@ export default function AdminWizard() {
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-6">
                   {form.images.map((img, i) => (
                     <div key={i} className="relative aspect-square bg-cream group">
-                      <Image src={img} alt="" fill className="object-cover" sizes="100px" />
+                      <AdminImageThumb src={img} />
                       <button
                         onClick={() =>
                           update(

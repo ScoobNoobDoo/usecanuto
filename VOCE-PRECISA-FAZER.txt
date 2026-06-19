@@ -2,11 +2,8 @@
 USECANUTO — O QUE SO VOCE PODE FAZER (5 minutos)
 ================================================================================
 
-1. SUPABASE STORAGE (upload de fotos no admin em producao)
-   - Abra: https://supabase.com/dashboard/project/mtygxpaypbgkggtuthxq
-   - SQL Editor > New query
-   - Cole o conteudo de: supabase-storage.sql
-   - Clique Run
+1. SUPABASE STORAGE — JA CONFIGURADO automaticamente.
+   (Se upload falhar no futuro, rode supabase-storage.sql no SQL Editor.)
 
 2. REDES SOCIAIS E CONTATO (links reais)
    No Netlify > Site settings > Environment variables, adicione ou atualize:

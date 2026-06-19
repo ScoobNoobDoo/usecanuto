@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
+import AdminImageThumb from "@/components/admin/AdminImageThumb";
+import { uploadImageFiles, IMAGE_ACCEPT } from "@/lib/upload-client";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Upload, Loader2, ArrowLeft, Save } from "lucide-react";
@@ -28,21 +29,27 @@ export default function EditProduct({
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [uploadError, setUploadError] = useState("");
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
+
+    const input = e.target;
     setUploading(true);
-    const newImages = [...images];
-    for (const file of Array.from(files)) {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.url) newImages.push(data.url);
+    setUploadError("");
+
+    try {
+      const { urls, error } = await uploadImageFiles(files);
+      if (urls.length) setImages((prev) => [...prev, ...urls]);
+      if (error) setUploadError(error);
+      else if (!urls.length) setUploadError("Nenhuma imagem foi enviada.");
+    } catch {
+      setUploadError("Falha no upload. Tente novamente.");
+    } finally {
+      setUploading(false);
+      input.value = "";
     }
-    setImages(newImages);
-    setUploading(false);
   };
 
   const handleSave = async () => {
@@ -112,7 +119,7 @@ export default function EditProduct({
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">
               {images.map((img, i) => (
                 <div key={i} className="relative aspect-square bg-cream group">
-                  <Image src={img} alt="" fill className="object-cover" sizes="100px" />
+                  <AdminImageThumb src={img} />
                   <button
                     onClick={() => setImages(images.filter((_, idx) => idx !== i))}
                     className="absolute top-1 right-1 w-5 h-5 bg-sale text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity"
@@ -123,10 +130,19 @@ export default function EditProduct({
               ))}
             </div>
             <label className="inline-flex items-center gap-2 border border-border px-4 py-2.5 text-sm cursor-pointer hover:bg-cream transition-colors">
-              <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
+              <input
+                type="file"
+                accept={IMAGE_ACCEPT}
+                multiple
+                onChange={handleUpload}
+                className="hidden"
+              />
               {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
               Adicionar imagens
             </label>
+            {uploadError && (
+              <p className="text-xs text-sale mt-2">{uploadError}</p>
+            )}
           </section>
 
           <section className="grid grid-cols-2 gap-4">
