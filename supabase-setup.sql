@@ -1,5 +1,10 @@
 -- Cole e execute no Supabase: SQL Editor > New query > Run
--- Libera leitura publica das tabelas da loja
+-- Libera leitura publica das tabelas da loja.
+--
+-- NOTA: Este SQL e suficiente para o Supabase. Nao precisa de politica
+-- extra para o admin — as APIs usam SUPABASE_SERVICE_ROLE_KEY, que ignora RLS.
+-- As categorias (Vestidos, Blusas, etc.) ja devem existir na tabela Category.
+-- Se algum produto nao aparece na categoria certa, rode supabase-fix-categories.sql
 
 ALTER TABLE "Product" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "Category" ENABLE ROW LEVEL SECURITY;

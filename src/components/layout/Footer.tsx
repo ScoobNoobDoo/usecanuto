@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Globe, Share2 } from "lucide-react";
+import { Globe, MessageCircle } from "lucide-react";
+import { siteConfig } from "@/lib/site-config";
 
 const FOOTER_LINKS = {
   Loja: [
@@ -15,7 +16,7 @@ const FOOTER_LINKS = {
     { label: "Trocas e Devoluções", href: "#" },
     { label: "Entregas", href: "#" },
     { label: "Pagamento", href: "#" },
-    { label: "Contato", href: "#" },
+    { label: "Contato", href: `mailto:${siteConfig.email}` },
   ],
   Institucional: [
     { label: "A Marca", href: "#" },
@@ -41,11 +42,23 @@ export default function Footer() {
               vestir mulheres que protagonizam suas escolhas.
             </p>
             <div className="flex gap-4 mt-6">
-              <a href="#" className="hover:text-accent-light transition-colors" aria-label="Instagram">
+              <a
+                href={siteConfig.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent-light transition-colors"
+                aria-label="Instagram"
+              >
                 <Globe size={20} strokeWidth={1.5} />
               </a>
-              <a href="#" className="hover:text-accent-light transition-colors" aria-label="Facebook">
-                <Share2 size={20} strokeWidth={1.5} />
+              <a
+                href={siteConfig.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent-light transition-colors"
+                aria-label="WhatsApp"
+              >
+                <MessageCircle size={20} strokeWidth={1.5} />
               </a>
             </div>
           </motion.div>
@@ -81,10 +94,10 @@ export default function Footer() {
           <p className="text-xs text-background/40">
             © {new Date().getFullYear()} UseCanuto. Todos os direitos reservados.
           </p>
-          <div className="flex gap-6 text-xs text-background/40">
-            <span>Cartão em até 6x</span>
-            <span>PIX disponível</span>
-            <span>Entrega expressa</span>
+          <div className="flex flex-wrap justify-center sm:justify-end gap-6 text-xs text-background/40">
+            {siteConfig.paymentMethods.map((method) => (
+              <span key={method}>{method}</span>
+            ))}
           </div>
         </div>
       </div>

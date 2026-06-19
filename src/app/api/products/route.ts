@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       images: body.images || [],
       sizes: body.sizes || [],
       colors: body.colors || [],
-      categoryId: body.categoryId || null,
+      categoryId: body.categoryId ? body.categoryId : null,
       featured: body.featured || false,
       active: body.active !== false,
     });

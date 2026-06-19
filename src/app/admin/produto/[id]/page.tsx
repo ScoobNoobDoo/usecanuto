@@ -1,6 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
-import { fetchProductById } from "@/lib/data";
+import { fetchProductById, fetchCategories } from "@/lib/data";
 import EditProduct from "./EditProduct";
 
 export default async function EditProductPage({
@@ -12,8 +12,11 @@ export default async function EditProductPage({
   if (!session) redirect("/admin/login");
 
   const { id } = await params;
-  const product = await fetchProductById(id);
+  const [product, categories] = await Promise.all([
+    fetchProductById(id),
+    fetchCategories(),
+  ]);
   if (!product) notFound();
 
-  return <EditProduct product={product} />;
+  return <EditProduct product={product} categories={categories} />;
 }

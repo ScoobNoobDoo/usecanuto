@@ -134,7 +134,7 @@ export default function AdminDashboard({
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-medium truncate">{product.title}</h3>
               <p className="text-xs text-muted">
-                {product.sizes.join(", ")} · {product.colors.join(", ")}
+                {product.category?.name || "Sem categoria"} · {product.sizes.join(", ")} · {product.colors.join(", ")}
               </p>
             </div>
 

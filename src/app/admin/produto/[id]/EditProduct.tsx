@@ -8,7 +8,15 @@ import { motion } from "framer-motion";
 import { Upload, Loader2, ArrowLeft, Save } from "lucide-react";
 import { formatPrice, type ProductData } from "@/lib/utils";
 
-export default function EditProduct({ product }: { product: ProductData }) {
+type DbCategory = { id: string; name: string; slug: string };
+
+export default function EditProduct({
+  product,
+  categories,
+}: {
+  product: ProductData;
+  categories: DbCategory[];
+}) {
   const router = useRouter();
   const [images, setImages] = useState(product.images);
   const [price, setPrice] = useState(String(product.price));
@@ -16,6 +24,7 @@ export default function EditProduct({ product }: { product: ProductData }) {
     product.salePrice ? String(product.salePrice) : ""
   );
   const [description, setDescription] = useState(product.description);
+  const [categoryId, setCategoryId] = useState(product.categoryId || "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -45,6 +54,7 @@ export default function EditProduct({ product }: { product: ProductData }) {
         price: parseFloat(price),
         salePrice: salePrice ? parseFloat(salePrice) : null,
         description,
+        categoryId: categoryId || null,
       }),
     });
     setSaving(false);
@@ -64,9 +74,32 @@ export default function EditProduct({ product }: { product: ProductData }) {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-serif text-2xl tracking-wide mb-1">{product.title}</h1>
-        <p className="text-sm text-muted mb-8">Editar preço e fotos</p>
+        <p className="text-sm text-muted mb-8">Editar categoria, preço, fotos e descrição</p>
 
         <div className="space-y-8">
+          <section>
+            <h2 className="text-xs tracking-wider uppercase text-muted mb-4">Categoria</h2>
+            <p className="text-xs text-muted mb-3">
+              Define em qual seção da loja a peça aparece
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCategoryId(cat.id)}
+                  className={`px-4 py-2 text-sm border transition-all duration-200 ${
+                    categoryId === cat.id
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border hover:border-foreground"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section>
             <h2 className="text-xs tracking-wider uppercase text-muted mb-4">Fotos</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">

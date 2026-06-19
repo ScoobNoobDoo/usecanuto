@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
@@ -16,12 +16,15 @@ import { useRouter } from "next/navigation";
 const STEPS = [
   { id: 1, label: "Novo Anúncio", desc: "Iniciar cadastro" },
   { id: 2, label: "Título", desc: "Nome da peça" },
-  { id: 3, label: "Tamanhos", desc: "Opções disponíveis" },
-  { id: 4, label: "Cores", desc: "Variações de cor" },
-  { id: 5, label: "Imagens", desc: "Fotos do produto" },
-  { id: 6, label: "Descrição", desc: "Detalhes da peça" },
-  { id: 7, label: "Preço", desc: "Valor de venda" },
+  { id: 3, label: "Categoria", desc: "Tipo da peça" },
+  { id: 4, label: "Tamanhos", desc: "Opções disponíveis" },
+  { id: 5, label: "Cores", desc: "Variações de cor" },
+  { id: 6, label: "Imagens", desc: "Fotos do produto" },
+  { id: 7, label: "Descrição", desc: "Detalhes da peça" },
+  { id: 8, label: "Preço", desc: "Valor de venda" },
 ];
+
+type DbCategory = { id: string; name: string; slug: string };
 
 const DEFAULT_SIZES = ["PP", "P", "M", "G", "GG"];
 const DEFAULT_COLORS = ["Preto", "Branco", "Bege", "Navy"];
@@ -44,6 +47,17 @@ export default function AdminWizard() {
   });
   const [customSize, setCustomSize] = useState("");
   const [customColor, setCustomColor] = useState("");
+  const [categories, setCategories] = useState<DbCategory[]>([]);
+  const [submitError, setSubmitError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => setCategories(Array.isArray(data) ? data : []))
+      .catch(() => setCategories([]));
+  }, []);
+
+  const selectedCategory = categories.find((c) => c.id === form.categoryId);
 
   const update = (key: string, value: unknown) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -75,23 +89,26 @@ export default function AdminWizard() {
   const canProceed = () => {
     switch (step) {
       case 2: return form.title.trim().length > 0;
-      case 3: return form.sizes.length > 0;
-      case 4: return form.colors.length > 0;
-      case 5: return form.images.length > 0;
-      case 6: return form.description.trim().length > 0;
-      case 7: return parseFloat(form.price) > 0;
+      case 3: return form.categoryId.length > 0;
+      case 4: return form.sizes.length > 0;
+      case 5: return form.colors.length > 0;
+      case 6: return form.images.length > 0;
+      case 7: return form.description.trim().length > 0;
+      case 8: return parseFloat(form.price) > 0;
       default: return true;
     }
   };
 
   const handleSubmit = async () => {
     setLoading(true);
+    setSubmitError("");
     try {
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          categoryId: form.categoryId || null,
           price: parseFloat(form.price),
           salePrice: form.salePrice ? parseFloat(form.salePrice) : null,
         }),
@@ -99,6 +116,9 @@ export default function AdminWizard() {
       if (res.ok) {
         router.push("/admin");
         router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setSubmitError(data.error || "Erro ao publicar. Tente novamente.");
       }
     } finally {
       setLoading(false);
@@ -154,7 +174,7 @@ export default function AdminWizard() {
               <h2 className="font-serif text-2xl tracking-wide mb-3">Criar Novo Anúncio</h2>
               <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
                 Siga as etapas para cadastrar uma nova peça na loja. Você poderá
-                adicionar título, tamanhos, cores, imagens, descrição e preço.
+                adicionar título, categoria, tamanhos, cores, imagens, descrição e preço.
               </p>
             </div>
           )}
@@ -175,6 +195,40 @@ export default function AdminWizard() {
           )}
 
           {step === 3 && (
+            <div>
+              <h2 className="font-serif text-xl tracking-wide mb-1">Categoria</h2>
+              <p className="text-sm text-muted mb-6">
+                Escolha onde a peça aparecerá na loja (Vestidos, Blusas, etc.)
+              </p>
+              {categories.length === 0 ? (
+                <p className="text-sm text-muted">Carregando categorias...</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => update("categoryId", cat.id)}
+                      className={`px-4 py-2 text-sm border transition-all duration-200 ${
+                        form.categoryId === cat.id
+                          ? "border-foreground bg-foreground text-background"
+                          : "border-border hover:border-foreground"
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {selectedCategory && (
+                <p className="text-xs text-muted mt-3">
+                  A peça será listada em: {selectedCategory.name}
+                </p>
+              )}
+            </div>
+          )}
+
+          {step === 4 && (
             <div>
               <h2 className="font-serif text-xl tracking-wide mb-1">Tamanhos</h2>
               <p className="text-sm text-muted mb-6">Selecione os tamanhos disponíveis</p>
@@ -221,7 +275,7 @@ export default function AdminWizard() {
             </div>
           )}
 
-          {step === 4 && (
+          {step === 5 && (
             <div>
               <h2 className="font-serif text-xl tracking-wide mb-1">Cores</h2>
               <p className="text-sm text-muted mb-6">Selecione as cores disponíveis</p>
@@ -263,7 +317,7 @@ export default function AdminWizard() {
             </div>
           )}
 
-          {step === 5 && (
+          {step === 6 && (
             <div>
               <h2 className="font-serif text-xl tracking-wide mb-1">Imagens</h2>
               <p className="text-sm text-muted mb-6">Adicione fotos do produto</p>
@@ -318,7 +372,7 @@ export default function AdminWizard() {
             </div>
           )}
 
-          {step === 6 && (
+          {step === 7 && (
             <div>
               <h2 className="font-serif text-xl tracking-wide mb-1">Descrição</h2>
               <p className="text-sm text-muted mb-6">
@@ -338,7 +392,7 @@ export default function AdminWizard() {
             </div>
           )}
 
-          {step === 7 && (
+          {step === 8 && (
             <div>
               <h2 className="font-serif text-xl tracking-wide mb-1">Preço</h2>
               <p className="text-sm text-muted mb-6">Defina o valor de venda</p>
@@ -381,7 +435,7 @@ export default function AdminWizard() {
               <div className="mt-8 p-4 bg-cream text-sm space-y-1">
                 <p className="font-medium">{form.title}</p>
                 <p className="text-muted text-xs">
-                  {form.sizes.join(" · ")} | {form.colors.join(" · ")}
+                  {selectedCategory?.name || "Sem categoria"} · {form.sizes.join(" · ")} · {form.colors.join(" · ")}
                 </p>
                 <p className="text-accent">
                   R$ {parseFloat(form.price || "0").toFixed(2).replace(".", ",")}
@@ -402,7 +456,11 @@ export default function AdminWizard() {
           Voltar
         </button>
 
-        {step < 7 ? (
+        {submitError && (
+          <p className="text-sm text-sale text-center mt-4">{submitError}</p>
+        )}
+
+        {step < 8 ? (
           <button
             onClick={() => setStep((s) => s + 1)}
             disabled={!canProceed()}

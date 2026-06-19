@@ -5,7 +5,7 @@ import { createOrder } from "@/lib/data";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, customerName, customerEmail, customerPhone } = body;
+    const { items, customerName, customerEmail, customerPhone, paymentMethod } = body;
 
     if (!items?.length || !customerName || !customerEmail) {
       return NextResponse.json(
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         customerEmail,
         customerPhone: customerPhone || null,
         status: "demo",
-        paymentMethod: "demo",
+        paymentMethod: paymentMethod || "demo",
       });
 
       return NextResponse.json({
@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
       customerEmail,
       customerPhone: customerPhone || null,
       status: "pending",
+      paymentMethod: paymentMethod || "card",
       stripeSessionId: session.id,
     });
 
