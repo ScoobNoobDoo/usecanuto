@@ -1,3 +1,0 @@
-{
-  "buildCommand": "prisma generate && prisma db push && npx tsx prisma/seed.ts && next build"
-}

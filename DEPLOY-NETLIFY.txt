@@ -1,0 +1,116 @@
+================================================================================
+  USECANUTO - DEPLOY SIMPLES: NETLIFY + SUPABASE
+================================================================================
+
+IMPORTANTE SOBRE "ARRASTAR O PROJETO":
+  O Netlify aceita arrastar pastas, MAS so para sites estaticos (HTML puro).
+  O UseCanuto e uma LOJA com login, banco de dados e pagamento — precisa
+  de 1 clique a mais no Netlify. Ainda e bem simples!
+
+  Voce vai: configurar o Supabase (5 min) + conectar no Netlify (5 min).
+
+================================================================================
+PARTE 1 - SUPABASE (voce ja tem conta!)
+================================================================================
+
+1. Entre em https://supabase.com e abra seu projeto
+   (ou crie um novo: New Project > nome "usecanuto")
+
+2. Va em: Settings (engrenagem) > Database
+
+3. Role ate "Connection string" e clique na aba "URI"
+
+4. Copie a senha do banco (Database password) — se nao lembra, clique
+   "Reset database password" e anote a nova senha
+
+5. Monte estas 2 URLs (substitua [SENHA] e [PROJECT-REF]):
+
+   DATABASE_URL (modo Transaction, porta 6543):
+   postgresql://postgres.[PROJECT-REF]:[SENHA]@aws-0-sa-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+
+   DIRECT_URL (modo Session, porta 5432):
+   postgresql://postgres.[PROJECT-REF]:[SENHA]@aws-0-sa-east-1.pooler.supabase.com:5432/postgres
+
+   DICA: No Supabase, mude o "Method" para "Transaction pooler" e copie
+   a URI — essa e a DATABASE_URL. Depois mude para "Session pooler" e copie
+   para DIRECT_URL. Substitua [YOUR-PASSWORD] pela senha real.
+
+   Salve as duas no Bloco de Notas!
+
+   NAO precisa criar tabelas manualmente — o site cria sozinho no deploy.
+
+================================================================================
+PARTE 2 - NETLIFY (colocar no ar)
+================================================================================
+
+OPCAO A — Pela tela do Netlify (recomendado, sem terminal):
+
+1. Primeiro envie o projeto pro GitHub (so uma vez):
+   - https://github.com/new > nome "usecanuto" > Create
+   - No PowerShell:
+     cd C:\Users\tozat\usecanuto
+     git remote add origin https://github.com/SEU-USUARIO/usecanuto.git
+     git push -u origin main
+
+2. Entre em https://app.netlify.com
+
+3. Clique "Add new site" > "Import an existing project"
+
+4. Escolha "GitHub" e autorize
+
+5. Selecione o repositorio "usecanuto"
+
+6. O Netlify ja detecta as configuracoes automaticamente (netlify.toml)
+   NAO mude nada na tela de build!
+
+7. Clique em "Add environment variables" e adicione:
+
+   DATABASE_URL     = (cole do Supabase)
+   DIRECT_URL       = (cole do Supabase)
+   JWT_SECRET       = usecanuto-secreto-2026
+   ADMIN_PASSWORD   = canuto2026
+   NEXT_PUBLIC_URL  = https://usecanuto.netlify.app
+
+8. Clique "Deploy site"
+
+9. Aguarde 3-5 minutos. Pronto! Link tipo:
+   https://usecanuto.netlify.app
+
+---
+
+OPCAO B — Sem GitHub (pelo terminal, 4 comandos):
+
+1. Configure as variaveis no painel Netlify depois do passo 3
+
+2. No PowerShell:
+   cd C:\Users\tozat\usecanuto
+   npx netlify-cli login
+   npx netlify-cli init
+   npx netlify-cli deploy --build --prod
+
+================================================================================
+PARTE 3 - PRONTO! O QUE SEU AMIGO USA
+================================================================================
+
+LOJA (clientes):     https://usecanuto.netlify.app
+ADMIN (ele edita):   https://usecanuto.netlify.app/admin/login
+
+Login admin:
+  E-mail: admin@usecanuto.com
+  Senha:  canuto2026
+
+================================================================================
+RESUMO: PRECISA DO SUPABASE?
+================================================================================
+
+SIM, mas e simples:
+  - Supabase = guarda produtos, precos, pedidos, login do admin
+  - Voce so copia 2 URLs de conexao (nao cria tabelas na mao)
+  - O site cria tudo automaticamente no primeiro deploy
+
+NAO precisa:
+  - Configurar SQL manualmente
+  - Criar tabelas no Supabase
+  - Saber programar
+
+================================================================================
