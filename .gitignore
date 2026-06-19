@@ -34,6 +34,8 @@ yarn-error.log*
 .env*
 !.env.example
 NETLIFY-VARIAVEIS.txt
+netlify-env-import.env
+NETLIFY-COLE-AGORA.txt
 
 # local database
 *.db
