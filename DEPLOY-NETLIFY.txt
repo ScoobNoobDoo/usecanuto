@@ -14,26 +14,28 @@ PARTE 1 - SUPABASE (voce ja tem conta!)
 ================================================================================
 
 1. Entre em https://supabase.com e abra seu projeto
-   (ou crie um novo: New Project > nome "usecanuto")
 
-2. Va em: Settings (engrenagem) > Database
+2. NAO use a "API URL" (aquela que termina em /rest/v1/) — essa e outra coisa!
 
-3. Role ate "Connection string" e clique na aba "URI"
+3. Clique no botao verde "Connect" no TOPO da pagina do projeto
+   Link direto do seu projeto:
+   https://supabase.com/dashboard/project/mtygxpaypbgkggtuthxq?showConnect=true
 
-4. Copie a senha do banco (Database password) — se nao lembra, clique
-   "Reset database password" e anote a nova senha
+4. Na janela que abrir:
+   - Aba "Connection String"
+   - Type: URI
 
-5. Monte estas 2 URLs (substitua [SENHA] e [PROJECT-REF]):
+5. Primeira URL (DATABASE_URL):
+   - Mude "Method" para: Transaction pooler
+   - Copie a URI inteira
+   - Troque [YOUR-PASSWORD] pela senha do banco
 
-   DATABASE_URL (modo Transaction, porta 6543):
-   postgresql://postgres.[PROJECT-REF]:[SENHA]@aws-0-sa-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+6. Segunda URL (DIRECT_URL):
+   - Mude "Method" para: Session pooler
+   - Copie a URI inteira
+   - Troque [YOUR-PASSWORD] pela mesma senha
 
-   DIRECT_URL (modo Session, porta 5432):
-   postgresql://postgres.[PROJECT-REF]:[SENHA]@aws-0-sa-east-1.pooler.supabase.com:5432/postgres
-
-   DICA: No Supabase, mude o "Method" para "Transaction pooler" e copie
-   a URI — essa e a DATABASE_URL. Depois mude para "Session pooler" e copie
-   para DIRECT_URL. Substitua [YOUR-PASSWORD] pela senha real.
+7. Se nao lembra a senha: Settings > Database > Reset database password
 
    Salve as duas no Bloco de Notas!
 
