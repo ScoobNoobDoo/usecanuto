@@ -12,6 +12,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "pix">("card");
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -42,6 +43,7 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     try {
       const res = await fetch("/api/checkout", {
@@ -53,6 +55,9 @@ export default function CheckoutPage() {
           customerEmail: form.email,
           customerPhone: form.phone,
           paymentMethod,
+          address: form.address,
+          city: form.city,
+          zip: form.zip,
         }),
       });
 
@@ -62,10 +67,14 @@ export default function CheckoutPage() {
         window.location.href = data.url;
       } else if (data.demo) {
         clearCart();
-        router.push(`/checkout/sucesso?demo=true&order=${data.orderId}`);
+        router.push(
+          `/checkout/sucesso?demo=true&order=${data.orderId}&method=${data.paymentMethod || paymentMethod}`
+        );
+      } else {
+        setError(data.error || "Erro ao processar. Tente novamente.");
       }
     } catch {
-      alert("Erro ao processar. Tente novamente.");
+      setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -183,8 +192,14 @@ export default function CheckoutPage() {
               )}
             </button>
 
+            {error && (
+              <p className="text-xs text-sale text-center mt-4">{error}</p>
+            )}
+
             <p className="text-[10px] text-muted text-center mt-4">
-              Pagamento seguro processado via Stripe
+              {paymentMethod === "pix"
+                ? "PIX com aprovação instantânea"
+                : "Pagamento seguro — cartão em até 6x"}
             </p>
           </div>
         </div>

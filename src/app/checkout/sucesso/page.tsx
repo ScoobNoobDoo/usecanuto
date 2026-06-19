@@ -9,6 +9,8 @@ import { useSearchParams } from "next/navigation";
 function SuccessContent() {
   const searchParams = useSearchParams();
   const isDemo = searchParams.get("demo") === "true";
+  const method = searchParams.get("method");
+  const orderId = searchParams.get("order");
 
   useEffect(() => {
     const confetti = async () => {
@@ -84,6 +86,17 @@ function SuccessContent() {
         Obrigada pela sua compra na UseCanuto.
       </motion.p>
 
+      {orderId && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.65 }}
+          className="text-xs text-muted mb-4"
+        >
+          Pedido #{orderId.slice(-8).toUpperCase()}
+        </motion.p>
+      )}
+
       {isDemo && (
         <motion.p
           initial={{ opacity: 0 }}
@@ -91,7 +104,9 @@ function SuccessContent() {
           transition={{ delay: 0.7 }}
           className="text-xs text-accent mb-6 bg-cream px-4 py-2 inline-block"
         >
-          Modo demonstração — configure o Stripe para pagamentos reais
+          {method === "pix"
+            ? "Modo demonstração — PIX simulado com sucesso"
+            : "Modo demonstração — configure o Stripe para pagamentos reais"}
         </motion.p>
       )}
 

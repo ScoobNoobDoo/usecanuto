@@ -13,15 +13,15 @@ const FOOTER_LINKS = {
     { label: "Sale", href: "/loja?sale=true" },
   ],
   Ajuda: [
-    { label: "Trocas e Devoluções", href: "#" },
-    { label: "Entregas", href: "#" },
-    { label: "Pagamento", href: "#" },
-    { label: "Contato", href: `mailto:${siteConfig.email}` },
+    { label: "Trocas e Devoluções", href: "/ajuda/trocas" },
+    { label: "Entregas", href: "/ajuda/entregas" },
+    { label: "Pagamento", href: "/ajuda/pagamento" },
+    { label: "Contato", href: "/contato" },
   ],
   Institucional: [
-    { label: "A Marca", href: "#" },
-    { label: "Política de Privacidade", href: "#" },
-    { label: "Termos de Uso", href: "#" },
+    { label: "A Marca", href: "/ajuda/sobre" },
+    { label: "Política de Privacidade", href: "/ajuda/privacidade" },
+    { label: "Termos de Uso", href: "/ajuda/termos" },
   ],
 };
 

@@ -49,6 +49,7 @@ export default function AdminWizard() {
   const [customColor, setCustomColor] = useState("");
   const [categories, setCategories] = useState<DbCategory[]>([]);
   const [submitError, setSubmitError] = useState("");
+  const [uploadError, setUploadError] = useState("");
 
   useEffect(() => {
     fetch("/api/categories")
@@ -70,6 +71,8 @@ export default function AdminWizard() {
     if (!files?.length) return;
 
     setUploading(true);
+    setUploadError("");
+    const newImages = [...form.images];
     for (const file of Array.from(files)) {
       const fd = new FormData();
       fd.append("file", file);
@@ -77,12 +80,15 @@ export default function AdminWizard() {
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (data.url) {
-          update("images", [...form.images, data.url]);
+          newImages.push(data.url);
+        } else if (data.error) {
+          setUploadError(data.error);
         }
       } catch {
-        /* ignore */
+        setUploadError("Falha no upload. Tente novamente.");
       }
     }
+    update("images", newImages);
     setUploading(false);
   };
 
@@ -348,6 +354,10 @@ export default function AdminWizard() {
                   </>
                 )}
               </label>
+
+              {uploadError && (
+                <p className="text-xs text-sale mt-3">{uploadError}</p>
+              )}
 
               {form.images.length > 0 && (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-6">

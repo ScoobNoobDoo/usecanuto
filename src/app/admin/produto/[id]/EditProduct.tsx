@@ -27,6 +27,7 @@ export default function EditProduct({
   const [categoryId, setCategoryId] = useState(product.categoryId || "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -46,7 +47,8 @@ export default function EditProduct({
 
   const handleSave = async () => {
     setSaving(true);
-    await fetch(`/api/products/${product.id}`, {
+    setSaveError("");
+    const res = await fetch(`/api/products/${product.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -58,8 +60,13 @@ export default function EditProduct({
       }),
     });
     setSaving(false);
-    router.push("/admin");
-    router.refresh();
+    if (res.ok) {
+      router.push("/admin");
+      router.refresh();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setSaveError(data.error || "Erro ao salvar. Tente novamente.");
+    }
   };
 
   return (
@@ -155,14 +162,21 @@ export default function EditProduct({
             />
           </section>
 
+          {saveError && (
+            <p className="text-sm text-sale">{saveError}</p>
+          )}
+
           <button
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || !categoryId}
             className="flex items-center gap-2 bg-foreground text-background px-6 py-3 text-sm tracking-wider uppercase hover:bg-accent transition-colors disabled:opacity-50"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             Salvar alterações
           </button>
+          {!categoryId && (
+            <p className="text-xs text-muted">Selecione uma categoria para salvar.</p>
+          )}
         </div>
       </motion.div>
     </div>

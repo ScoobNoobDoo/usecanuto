@@ -5,7 +5,16 @@ import { createOrder } from "@/lib/data";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, customerName, customerEmail, customerPhone, paymentMethod } = body;
+    const {
+      items,
+      customerName,
+      customerEmail,
+      customerPhone,
+      paymentMethod,
+      address,
+      city,
+      zip,
+    } = body;
 
     if (!items?.length || !customerName || !customerEmail) {
       return NextResponse.json(
@@ -20,6 +29,9 @@ export async function POST(req: NextRequest) {
       0
     );
 
+    const shippingAddress = [address, city, zip].filter(Boolean).join(", ") || null;
+    const method = paymentMethod === "pix" ? "pix" : "card";
+
     if (!isStripeConfigured() || !stripe) {
       const order = await createOrder({
         items: JSON.stringify(items),
@@ -27,13 +39,15 @@ export async function POST(req: NextRequest) {
         customerName,
         customerEmail,
         customerPhone: customerPhone || null,
+        shippingAddress,
         status: "demo",
-        paymentMethod: paymentMethod || "demo",
+        paymentMethod: method,
       });
 
       return NextResponse.json({
         demo: true,
         orderId: order.id,
+        paymentMethod: method,
         message:
           "Modo demonstração: configure STRIPE_SECRET_KEY para pagamentos reais.",
       });
@@ -44,8 +58,11 @@ export async function POST(req: NextRequest) {
       process.env.NEXT_PUBLIC_URL ||
       "http://localhost:3000";
 
+    const paymentTypes: ("card" | "pix")[] =
+      method === "pix" ? ["pix"] : ["card"];
+
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: paymentTypes,
       mode: "payment",
       customer_email: customerEmail,
       line_items: items.map(
@@ -79,6 +96,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         customerName,
         customerPhone: customerPhone || "",
+        shippingAddress: shippingAddress || "",
       },
     });
 
@@ -88,8 +106,9 @@ export async function POST(req: NextRequest) {
       customerName,
       customerEmail,
       customerPhone: customerPhone || null,
+      shippingAddress,
       status: "pending",
-      paymentMethod: paymentMethod || "card",
+      paymentMethod: method,
       stripeSessionId: session.id,
     });
 

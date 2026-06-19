@@ -1,0 +1,37 @@
+================================================================================
+USECANUTO — O QUE SO VOCE PODE FAZER (5 minutos)
+================================================================================
+
+1. SUPABASE STORAGE (upload de fotos no admin em producao)
+   - Abra: https://supabase.com/dashboard/project/mtygxpaypbgkggtuthxq
+   - SQL Editor > New query
+   - Cole o conteudo de: supabase-storage.sql
+   - Clique Run
+
+2. REDES SOCIAIS E CONTATO (links reais)
+   No Netlify > Site settings > Environment variables, adicione ou atualize:
+
+   NEXT_PUBLIC_INSTAGRAM_URL = https://instagram.com/SEU_PERFIL
+   NEXT_PUBLIC_WHATSAPP_URL   = https://wa.me/55SEUDDDNUMERO
+   NEXT_PUBLIC_CONTACT_EMAIL  = seu@email.com
+
+   Depois: Deploys > Trigger deploy
+
+3. PAGAMENTO REAL (opcional — hoje funciona em modo demo)
+   - Crie conta em https://stripe.com
+   - Adicione no Netlify:
+     STRIPE_SECRET_KEY = sk_...
+     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = pk_...
+
+4. SEGURANCA (recomendado)
+   - Supabase > Settings > API > Regenerate service_role e anon keys
+   - Atualize as chaves no Netlify
+   - Troque JWT_SECRET e ADMIN_PASSWORD no Netlify
+
+5. DOMINIO PROPRIO (opcional)
+   - Netlify > Domain management > Add domain
+   - Aponte usecanuto.com.br para o Netlify
+
+================================================================================
+TUDO O MAIS JA FOI FEITO NO CODIGO E ENVIADO AO GITHUB.
+================================================================================

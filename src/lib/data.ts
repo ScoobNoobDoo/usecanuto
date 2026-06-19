@@ -251,6 +251,7 @@ export async function createOrder(input: {
   customerName: string;
   customerEmail: string;
   customerPhone: string | null;
+  shippingAddress?: string | null;
   status: string;
   paymentMethod?: string;
   stripeSessionId?: string;
