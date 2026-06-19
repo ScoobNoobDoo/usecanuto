@@ -5,11 +5,15 @@ import CategoryGrid from "@/components/home/CategoryGrid";
 import ProductGrid from "@/components/home/ProductGrid";
 import Newsletter from "@/components/home/Newsletter";
 import { getFeaturedProducts } from "@/lib/products";
+import { fetchSiteContent } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const products = await getFeaturedProducts();
+  const [products, siteContent] = await Promise.all([
+    getFeaturedProducts(),
+    fetchSiteContent(),
+  ]);
 
   return (
     <>
@@ -19,8 +23,8 @@ export default async function HomePage() {
       <CategoryGrid />
       <ProductGrid
         products={products}
-        title="Destaques"
-        subtitle="Seleção especial"
+        title={siteContent.featuredSection.title}
+        subtitle={siteContent.featuredSection.subtitle}
       />
       <Newsletter />
     </>

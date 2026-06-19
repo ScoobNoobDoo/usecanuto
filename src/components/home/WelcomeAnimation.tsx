@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSiteContent } from "@/context/SiteContentContext";
 
 export default function WelcomeAnimation() {
+  const { welcome } = useSiteContent();
   const [show, setShow] = useState(true);
   const [phase, setPhase] = useState(0);
 
@@ -60,7 +62,7 @@ export default function WelcomeAnimation() {
               animate={{ opacity: phase >= 0 ? 1 : 0, y: phase >= 0 ? 0 : 30 }}
               transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              USECANUTO
+              {welcome.title}
             </motion.h1>
 
             <motion.p
@@ -72,7 +74,7 @@ export default function WelcomeAnimation() {
               }}
               transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              Moda com protagonismo
+              {welcome.subtitle}
             </motion.p>
 
             <motion.div

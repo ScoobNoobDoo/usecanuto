@@ -13,6 +13,7 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  Layout,
 } from "lucide-react";
 import { formatPrice, type ProductData } from "@/lib/utils";
 
@@ -67,7 +68,14 @@ export default function AdminDashboard({
           <h1 className="font-serif text-3xl tracking-wide">Painel Admin</h1>
           <p className="text-sm text-muted mt-1">{adminEmail}</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/admin/conteudo"
+            className="flex items-center gap-2 border border-border px-5 py-2.5 text-sm tracking-wider uppercase hover:bg-cream transition-colors"
+          >
+            <Layout size={16} />
+            Editar Site
+          </Link>
           <Link
             href="/admin/novo-produto"
             className="flex items-center gap-2 bg-foreground text-background px-5 py-2.5 text-sm tracking-wider uppercase hover:bg-accent transition-colors"

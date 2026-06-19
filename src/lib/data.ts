@@ -1,10 +1,18 @@
 import { getSupabase } from "@/lib/supabase";
 import {
+  DEFAULT_SITE_CONTENT,
+  mergeSiteContent,
+  type SiteContent,
+} from "@/lib/site-content";
+import {
   serializeProduct,
   parseJsonArray,
   generateId,
   type ProductData,
 } from "@/lib/utils";
+
+const SITE_CONTENT_PATH = "config/site-content.json";
+const STORAGE_BUCKET = "product-images";
 
 type DbProduct = {
   id: string;
@@ -297,4 +305,33 @@ export async function fetchCategories() {
 
   if (error) return [];
   return data || [];
+}
+
+export async function fetchSiteContent(): Promise<SiteContent> {
+  try {
+    const { data, error } = await getSupabase()
+      .storage.from(STORAGE_BUCKET)
+      .download(SITE_CONTENT_PATH);
+
+    if (error || !data) return DEFAULT_SITE_CONTENT;
+
+    const parsed = JSON.parse(await data.text()) as Partial<SiteContent>;
+    return mergeSiteContent(parsed);
+  } catch {
+    return DEFAULT_SITE_CONTENT;
+  }
+}
+
+export async function updateSiteContent(content: SiteContent) {
+  const buffer = Buffer.from(JSON.stringify(content, null, 2), "utf-8");
+  const { error } = await getSupabase()
+    .storage.from(STORAGE_BUCKET)
+    .upload(SITE_CONTENT_PATH, buffer, {
+      contentType: "application/json",
+      upsert: true,
+      cacheControl: "60",
+    });
+
+  if (error) throw new Error(error.message);
+  return content;
 }

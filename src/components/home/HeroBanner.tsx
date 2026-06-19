@@ -5,8 +5,10 @@ import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { ArrowRight } from "lucide-react";
+import { useSiteContent } from "@/context/SiteContentContext";
 
 export default function HeroBanner() {
+  const { hero } = useSiteContent();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -19,10 +21,11 @@ export default function HeroBanner() {
     <section ref={ref} className="relative h-[85vh] min-h-[600px] overflow-hidden">
       <motion.div style={{ y }} className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&q=80"
+          src={hero.image}
           alt="Coleção UseCanuto"
           fill
           priority
+          unoptimized={hero.image.startsWith("http")}
           className="object-cover"
           sizes="100vw"
         />
@@ -40,7 +43,7 @@ export default function HeroBanner() {
             transition={{ duration: 0.8, delay: 3.5 }}
             className="inline-block text-xs tracking-[0.3em] uppercase text-white/70 mb-4"
           >
-            Nova Coleção — Verão 26
+            {hero.eyebrow}
           </motion.span>
 
           <motion.h2
@@ -49,9 +52,9 @@ export default function HeroBanner() {
             transition={{ duration: 0.8, delay: 3.7 }}
             className="font-serif text-4xl sm:text-5xl md:text-6xl text-white font-light leading-tight"
           >
-            Elegância que
+            {hero.title}
             <br />
-            <span className="italic">protagoniza</span>
+            <span className="italic">{hero.titleAccent}</span>
           </motion.h2>
 
           <motion.p
@@ -60,8 +63,7 @@ export default function HeroBanner() {
             transition={{ duration: 0.8, delay: 3.9 }}
             className="text-white/60 mt-4 text-sm leading-relaxed max-w-sm"
           >
-            Descubra peças que traduzem feminilidade, conforto e expressão —
-            feitas para você viver o agora com autenticidade.
+            {hero.description}
           </motion.p>
 
           <motion.div
@@ -71,20 +73,20 @@ export default function HeroBanner() {
             className="flex gap-4 mt-8"
           >
             <Link
-              href="/loja"
+              href={hero.primaryCta.href}
               className="group inline-flex items-center gap-2 bg-white text-foreground px-8 py-3.5 text-sm tracking-wider uppercase hover:bg-accent hover:text-white transition-all duration-300"
             >
-              Explorar coleção
+              {hero.primaryCta.text}
               <ArrowRight
                 size={16}
                 className="group-hover:translate-x-1 transition-transform duration-300"
               />
             </Link>
             <Link
-              href="/loja?sale=true"
+              href={hero.secondaryCta.href}
               className="inline-flex items-center gap-2 border border-white/40 text-white px-8 py-3.5 text-sm tracking-wider uppercase hover:bg-white/10 transition-all duration-300"
             >
-              Sale até 40%
+              {hero.secondaryCta.text}
             </Link>
           </motion.div>
         </div>

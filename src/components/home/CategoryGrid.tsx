@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { STORE_CATEGORIES } from "@/lib/categories";
+import { useSiteContent } from "@/context/SiteContentContext";
 
 export default function CategoryGrid() {
+  const { categorySection, categories } = useSiteContent();
+
   return (
     <section className="py-16 bg-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -16,13 +18,15 @@ export default function CategoryGrid() {
           className="text-center mb-10"
         >
           <span className="text-xs tracking-[0.3em] uppercase text-muted">
-            Explore por categoria
+            {categorySection.eyebrow}
           </span>
-          <h2 className="font-serif text-3xl tracking-wide mt-2">Navegue</h2>
+          <h2 className="font-serif text-3xl tracking-wide mt-2">
+            {categorySection.title}
+          </h2>
         </motion.div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {STORE_CATEGORIES.filter((cat) => cat.slug !== "acessorios").map((cat, i) => (
+          {categories.map((cat, i) => (
             <motion.div
               key={cat.slug}
               initial={{ opacity: 0, y: 30 }}
@@ -30,11 +34,15 @@ export default function CategoryGrid() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
             >
-              <Link href={`/loja?categoria=${cat.slug}`} className="group block relative aspect-[4/5] overflow-hidden">
+              <Link
+                href={`/loja?categoria=${cat.slug}`}
+                className="group block relative aspect-[4/5] overflow-hidden"
+              >
                 <Image
                   src={cat.image}
                   alt={cat.name}
                   fill
+                  unoptimized={cat.image.startsWith("http")}
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 768px) 50vw, 25vw"
                 />

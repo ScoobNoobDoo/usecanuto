@@ -13,6 +13,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useSiteContent } from "@/context/SiteContentContext";
 
 const NAV_ITEMS = [
   {
@@ -49,6 +50,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const { count, setIsOpen } = useCart();
+  const { headerMarquee, brandName } = useSiteContent();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -70,9 +72,9 @@ export default function Header() {
           <div className="animate-marquee whitespace-nowrap inline-flex gap-16">
             {[...Array(4)].map((_, i) => (
               <span key={i} className="inline-flex gap-16">
-                <span>Frete grátis acima de R$ 399</span>
-                <span>PIX em até 4x sem juros</span>
-                <span>15% OFF primeira compra — BEMVINDA15</span>
+                {headerMarquee.map((line, j) => (
+                  <span key={j}>{line}</span>
+                ))}
               </span>
             ))}
           </div>
@@ -136,7 +138,7 @@ export default function Header() {
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                USECANUTO
+                {brandName}
               </motion.h1>
             </Link>
 
@@ -197,7 +199,7 @@ export default function Header() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-8">
-                <span className="font-serif text-xl tracking-widest">USECANUTO</span>
+                <span className="font-serif text-xl tracking-widest">{brandName}</span>
                 <button onClick={() => setMenuOpen(false)}>
                   <X size={22} />
                 </button>

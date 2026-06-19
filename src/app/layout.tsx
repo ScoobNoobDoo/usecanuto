@@ -6,6 +6,10 @@ import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/layout/CartDrawer";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import { CartProvider } from "@/context/CartContext";
+import { SiteContentProvider } from "@/context/SiteContentContext";
+import { fetchSiteContent } from "@/lib/data";
+
+export const dynamic = "force-dynamic";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -30,21 +34,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteContent = await fetchSiteContent();
+
   return (
     <html lang="pt-BR" className={`${cormorant.variable} ${jost.variable}`}>
       <body className="min-h-screen flex flex-col antialiased">
-        <CartProvider>
-          <Header />
-          <main className="flex-1 pt-[104px] lg:pt-[120px]">{children}</main>
-          <Footer />
-          <CartDrawer />
-          <WhatsAppButton />
-        </CartProvider>
+        <SiteContentProvider content={siteContent}>
+          <CartProvider>
+            <Header />
+            <main className="flex-1 pt-[104px] lg:pt-[120px]">{children}</main>
+            <Footer />
+            <CartDrawer />
+            <WhatsAppButton />
+          </CartProvider>
+        </SiteContentProvider>
       </body>
     </html>
   );

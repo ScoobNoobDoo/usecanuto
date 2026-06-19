@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useSiteContent } from "@/context/SiteContentContext";
 
 export default function Newsletter() {
+  const { newsletter } = useSiteContent();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -23,14 +25,12 @@ export default function Newsletter() {
           transition={{ duration: 0.6 }}
         >
           <span className="text-xs tracking-[0.3em] uppercase text-muted">
-            Newsletter
+            {newsletter.eyebrow}
           </span>
           <h2 className="font-serif text-3xl tracking-wide mt-2 mb-3">
-            15% OFF na primeira compra
+            {newsletter.title}
           </h2>
-          <p className="text-sm text-muted mb-8">
-            Assine e receba novidades exclusivas. Cupom: BEMVINDA15
-          </p>
+          <p className="text-sm text-muted mb-8">{newsletter.description}</p>
 
           {submitted ? (
             <motion.p
@@ -38,7 +38,7 @@ export default function Newsletter() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-sm text-accent"
             >
-              Obrigada por se inscrever! Verifique seu e-mail.
+              {newsletter.successMessage}
             </motion.p>
           ) : (
             <form onSubmit={handleSubmit} className="flex gap-0 max-w-md mx-auto">

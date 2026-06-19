@@ -33,6 +33,7 @@ async function main() {
         "image/gif",
         "image/heic",
         "image/heif",
+        "application/json",
       ],
     });
     if (error) {
@@ -51,6 +52,7 @@ async function main() {
         "image/gif",
         "image/heic",
         "image/heif",
+        "application/json",
       ],
     });
     if (error) {

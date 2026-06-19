@@ -7,12 +7,12 @@ VALUES (
   'product-images',
   true,
   5242880,
-  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif', 'application/json']
 )
 ON CONFLICT (id) DO UPDATE SET
   public = true,
   file_size_limit = 5242880,
-  allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'];
+  allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif', 'application/json'];
 
 DROP POLICY IF EXISTS "public_read_product_images" ON storage.objects;
 CREATE POLICY "public_read_product_images" ON storage.objects
