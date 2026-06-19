@@ -1,7 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { serializeProduct } from "@/lib/utils";
+import { fetchProductById } from "@/lib/data";
 import EditProduct from "./EditProduct";
 
 export default async function EditProductPage({
@@ -13,12 +12,8 @@ export default async function EditProductPage({
   if (!session) redirect("/admin/login");
 
   const { id } = await params;
-  const product = await prisma.product.findUnique({
-    where: { id },
-    include: { category: { select: { id: true, name: true, slug: true } } },
-  });
-
+  const product = await fetchProductById(id);
   if (!product) notFound();
 
-  return <EditProduct product={serializeProduct(product)} />;
+  return <EditProduct product={product} />;
 }

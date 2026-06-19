@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { fetchAdminById } from "@/lib/data";
 
 export async function GET() {
   const session = await getAdminSession();
@@ -8,10 +8,6 @@ export async function GET() {
     return NextResponse.json({ authenticated: false });
   }
 
-  const admin = await prisma.admin.findUnique({
-    where: { id: session.id },
-    select: { name: true, email: true },
-  });
-
+  const admin = await fetchAdminById(session.id);
   return NextResponse.json({ authenticated: true, admin });
 }

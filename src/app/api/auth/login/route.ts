@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
 import { verifyPassword, createToken } from "@/lib/auth";
+import { fetchAdminByEmail } from "@/lib/data";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const admin = await prisma.admin.findUnique({ where: { email } });
+    const admin = await fetchAdminByEmail(email);
     if (!admin || !(await verifyPassword(password, admin.password))) {
       return NextResponse.json(
         { error: "Credenciais inválidas" },

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe, isStripeConfigured } from "@/lib/stripe";
-import { prisma } from "@/lib/db";
+import { createOrder } from "@/lib/data";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,16 +21,14 @@ export async function POST(req: NextRequest) {
     );
 
     if (!isStripeConfigured() || !stripe) {
-      const order = await prisma.order.create({
-        data: {
-          items: JSON.stringify(items),
-          total,
-          customerName,
-          customerEmail,
-          customerPhone: customerPhone || null,
-          status: "demo",
-          paymentMethod: "demo",
-        },
+      const order = await createOrder({
+        items: JSON.stringify(items),
+        total,
+        customerName,
+        customerEmail,
+        customerPhone: customerPhone || null,
+        status: "demo",
+        paymentMethod: "demo",
       });
 
       return NextResponse.json({
@@ -41,7 +39,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+    const origin =
+      req.headers.get("origin") ||
+      process.env.NEXT_PUBLIC_URL ||
+      "http://localhost:3000";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -60,7 +61,13 @@ export async function POST(req: NextRequest) {
             currency: "brl",
             product_data: {
               name: `${item.title} - ${item.size} / ${item.color}`,
-              images: item.image ? [item.image.startsWith("http") ? item.image : `${origin}${item.image}`] : [],
+              images: item.image
+                ? [
+                    item.image.startsWith("http")
+                      ? item.image
+                      : `${origin}${item.image}`,
+                  ]
+                : [],
             },
             unit_amount: Math.round(item.price * 100),
           },
@@ -75,21 +82,22 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await prisma.order.create({
-      data: {
-        items: JSON.stringify(items),
-        total,
-        customerName,
-        customerEmail,
-        customerPhone: customerPhone || null,
-        status: "pending",
-        stripeSessionId: session.id,
-      },
+    await createOrder({
+      items: JSON.stringify(items),
+      total,
+      customerName,
+      customerEmail,
+      customerPhone: customerPhone || null,
+      status: "pending",
+      stripeSessionId: session.id,
     });
 
     return NextResponse.json({ url: session.url });
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: "Erro ao processar pagamento" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erro ao processar pagamento" },
+      { status: 500 }
+    );
   }
 }

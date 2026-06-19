@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { countProducts } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const count = await prisma.product.count();
+    const count = await countProducts();
     return NextResponse.json({
       ok: true,
-      database: "connected",
+      database: "supabase",
       products: count,
     });
   } catch (error) {
@@ -16,10 +16,12 @@ export async function GET() {
     return NextResponse.json(
       {
         ok: false,
-        database: "error",
         message,
-        hasDatabaseUrl: !!process.env.DATABASE_URL,
-        hasDirectUrl: !!process.env.DIRECT_URL,
+        hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        hasKey: !!(
+          process.env.SUPABASE_SERVICE_ROLE_KEY ||
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        ),
       },
       { status: 500 }
     );
