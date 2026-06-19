@@ -1,6 +1,5 @@
 import ProductGrid from "@/components/home/ProductGrid";
-import { prisma } from "@/lib/db";
-import { serializeProduct } from "@/lib/utils";
+import { getAllProducts } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
 
@@ -11,16 +10,9 @@ export default async function LojaPage({
 }) {
   const params = await searchParams;
 
-  const products = await prisma.product.findMany({
-    where: {
-      active: true,
-      ...(params.categoria
-        ? { category: { slug: params.categoria } }
-        : {}),
-      ...(params.sale === "true" ? { salePrice: { not: null } } : {}),
-    },
-    include: { category: { select: { id: true, name: true, slug: true } } },
-    orderBy: { createdAt: "desc" },
+  const products = await getAllProducts({
+    category: params.categoria,
+    sale: params.sale === "true",
   });
 
   const title =
@@ -32,7 +24,7 @@ export default async function LojaPage({
 
   return (
     <ProductGrid
-      products={products.map(serializeProduct)}
+      products={products}
       title={title}
       subtitle="UseCanuto"
     />

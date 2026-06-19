@@ -12,22 +12,29 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
 
-  const product = await prisma.product.findFirst({
-    where: { slug, active: true },
-    include: { category: { select: { id: true, name: true, slug: true } } },
-  });
+  let product = null;
+  let related: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
 
-  if (!product) notFound();
+  try {
+    product = await prisma.product.findFirst({
+      where: { slug, active: true },
+      include: { category: { select: { id: true, name: true, slug: true } } },
+    });
 
-  const related = await prisma.product.findMany({
-    where: {
-      active: true,
-      categoryId: product.categoryId,
-      id: { not: product.id },
-    },
-    take: 4,
-    include: { category: { select: { id: true, name: true, slug: true } } },
-  });
+    if (!product) notFound();
+
+    related = await prisma.product.findMany({
+      where: {
+        active: true,
+        categoryId: product.categoryId,
+        id: { not: product.id },
+      },
+      take: 4,
+      include: { category: { select: { id: true, name: true, slug: true } } },
+    });
+  } catch {
+    notFound();
+  }
 
   return (
     <ProductDetail
